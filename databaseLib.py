@@ -19,7 +19,7 @@ class main:
 		items = c.fetchall();
 		return [i[0] for i in items];
 
-	def execute(self, command):
+	def execute(self, command: str):
 		c = self.conn.cursor()
 		c.execute(command);
 		items = c.fetchall();
@@ -27,7 +27,7 @@ class main:
 		self.conn.commit();
 		return items;
 
-	def getTable(self, tableName):
+	def getTable(self, tableName: str):
 		c = self.conn.cursor();
 		try:
 			c.execute(f"SELECT * FROM {tableName}");
@@ -40,7 +40,7 @@ class main:
 			print(e);
 			return;
 
-	def makeTable(self, tableName, params):
+	def makeTable(self, tableName: str, params: []):
 		c = self.conn.cursor();
 		try:
 			c.execute(f"""CREATE TABLE {tableName} (
@@ -52,7 +52,7 @@ class main:
 			print("unable to make table");
 			print(e);
 
-	def deleteTable(self, tableName):
+	def deleteTable(self, tableName: str):
 		c = self.conn.cursor();
 		try:
 			c.execute(f"DROP TABLE {tableName}");
@@ -64,7 +64,7 @@ class main:
 			print("use the command getTables() to get all tables in the database");
 			print(e);
 
-	def formatTable(self, tableName):
+	def formatTable(self, tableName: str):
 		table = self.getTable(tableName);
 		c = self.conn.cursor();
 		try:
@@ -83,7 +83,7 @@ class main:
 			tablefmt = 'psql'
 		))
 
-	def getFreq(self, tableName, columnName):
+	def getFreq(self, tableName: str, columnName: str):
 		c = self.conn.cursor();
 		try:
 			c.execute(f"SELECT {columnName} FROM {tableName}");
@@ -118,42 +118,42 @@ class main:
 
 		return whole;
 
-	def formatArray(self, arr, headerArr):
+	def formatArray(self, arr: [], headerArr: []):
 		return tabulate(
 			arr,
 			headers = headerArr,
 			tablefmt = 'psql'
 			);
 
-	def getColumns(self, tableName):
+	def getColumns(self, tableName: str):
 		ls = self.__formatColumns(tableName);
 		return [i[0] for i in ls]
 
-	def getColumn(self, tableName, columnName):
+	def getColumn(self, tableName: str, columnName: str):
 		c = self.conn.cursor();
 		c.execute(f"SELECT {columnName} FROM {tableName}");
 		items = c.fetchall();
 		items = self.__fixTable(items);
 		return [x[0] for x in items];
 
-	def __formatColumns(self, tableName):
+	def __formatColumns(self, tableName: str):
 		c = self.conn.cursor();
 		c.execute(f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{tableName}'");
 		return (c.fetchall());
 
-	def __fixTable(self, items):
+	def __fixTable(self, items: []):
 		del items[0];
 		del items[-1];
 		return items; 
 
-	def __formatList(self, info):
+	def __formatList(self, info: []):
 		final = "";
 		for i in range(len(info)-1):
 			final += f"{info[i][0]} {info[i][1]},\n";
 		final += f"{info[-1][0]} {info[-1][1]}";
 		return final;
 
-	def __init__(self, name):
+	def __init__(self, name: str):
 		self.DB_NAME = f"{name}";
 		DB_USER = "postgres"
 		DB_PASS = "rootUser"
@@ -166,44 +166,4 @@ class main:
 		    print("unable to connect to Server")
 		    print(e);
 		    return;
-
-	def help(self):
-		print("Basic information about the lib for anyone who for some reason is using it");
-		print("This library is not very well designed");
-		print("it's intended to be used for navigating and working with psql databases running on localhost");
-		print("help() - prints this message, returns nothing");
-		print("initalization - used by calling main and passing in the name of a database");
-		print("running on the hosts machine");
-		print();
-		print("getTables() - returns a list of all the tables in the database, takes no arguments");
-		print();
-		print("getTable(tableName) - returns the content of a given table in the form of a sql array, takes one string argument called tableName");
-		print();
-		print("makeTable() - makes a table new table and saves it to the database.");
-		print("		makeTable() takes two arguments the name of the table and a 2D array with the table params");
-		print("		for example, if I want to make a table with an integer column named 'id' and a string column named 'name'");
-		print("	I'd do something like this this");
-		print(""" 	params = [[INT, "id"], [TEXT, "name"]]""");
-		print("""	makeTable("tableName", params)""");
-		print();
-		print("deleteTable(tableName) - deletes a table and saves the changes to the database, takes one string argument tableName");
-		print();
-		print("formatTable(tableName) - returns a table formatted using tabulate, takes one string argument tableName");
-		print();
-		print("execute(command) - allows to user to pass in normal sql commands and returns the output");
-		print("if I wanted to run a command to get a table from the database I'd do something like this");
-		print("""	execute(("SELECT * FROM tableName"))""");
-		print("the function automatically gets everything and commits all changes to the database and returns it so no reason to call fetchall() or conn.commit()");
-		print();
-		print("getFreq(tableName, columnName) - returns the frequency of every entry in a given column in the form of a sorted 2D array");
-		print();
-		print("getWholeDB() - returns every table in the database as a normal array, each item in the array is the sql array consisting of 1 table");
-		print();
-		print("getColumns(tableName) - returns the name of every column in a table, takes on string argument tableName");
-		print("This is the end of the documentation");
-		print();
-		print("getColumn(tableName, columnName - returns all the entries of a column in for form of an array, takes one string tableName and one string ColumnName");
-		print();
-		print("formatArray(arr, headerArray) - formats an array using tabulate, takes on array of data and one array with headers");
-		print();
 
