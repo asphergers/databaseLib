@@ -135,6 +135,18 @@ class main:
 		items = c.fetchall();
 		items = self.__fixTable(items);
 		return [x[0] for x in items];
+	
+	def searchColumn(self, tableName: str, columnName: str, searchTerm: str):
+		c = self.conn.cursor();
+		c.execute(f"SELECT {columnName} FROM {tableName} WHERE LIKE '%{searchTerm}%'");
+		items = c.fetchall();
+		return items;
+
+	def searchTable(self, tableName: str, searchTerm: str):
+		c = self.conn.cursor();
+		c.execute(f"SELECT * FROM {tableName} WHERE LIKE '%{searchTerm}%'");
+		items = c.fetchall();
+		return items; 
 
 	def __formatColumns(self, tableName: str):
 		c = self.conn.cursor();
@@ -153,15 +165,16 @@ class main:
 		final += f"{info[-1][0]} {info[-1][1]}";
 		return final;
 
-	def __init__(self, name: str):
-		self.DB_NAME = f"{name}";
-		DB_USER = "postgres"
-		DB_PASS = "rootUser"
-		DB_HOST = "localhost"
-		DB_PORT = "5432"
+	def __init__(self, dbname: str, dbuser: str, dbpass: str, dbhost: str, dbport: str):
+		self.DB_NAME = dbname;
+		DB_USER = dbuser;
+		DB_PASS = dbpass;
+		DB_HOST = dbpass;
+		DB_PORT = dbport;
 		try:
-		     self.conn = psycopg2.connect(database = self.DB_NAME, user = DB_USER, password = DB_PASS, host = DB_HOST, port = DB_PORT)
-		     print("connected to database")
+		     self.conn = psycopg2.connect(database = self.DB_NAME, user = DB_USER, password = DB_PASS, host = DB_HOST, port = DB_PORT);
+		     print("connected to database");
+		     return;
 		except Exception as e:
 		    print("unable to connect to Server")
 		    print(e);
